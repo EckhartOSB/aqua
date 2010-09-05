@@ -1,0 +1,65 @@
+.\" man page for the pcpustat utility.
+.Dd September 4, 2010
+.Dt aqua 1
+.Os
+.Sh NAME
+.Nm aqua
+.Nd Advanced Query Using Abook
+.Sh SYNOPSIS
+.Nm
+.Op Fl 1
+.Op Fl f Ar addressbook
+.Op Ar term...
+.Sh DESCRIPTION
+The aqua utility provides a drop-in replacement for abook's mutt-query option.  Whereas abook only searches its name and email fields,
+aqua can search all fields.  You can also specify which specific fields to search, combine searches with and/or and parenthesized grouping,
+and include regular expressions.  aqua only returns contacts who have at least one email address.
+.Sh OPTIONS
+.Bl -tag -width indent
+.It Fl 1, first
+Only return the first email address for each matching entry.  By default, all addresses are returned, separated by commas.
+.It Fl f, file Ar addressbook
+Specify the address book to search.  The default is ~/.abook/addressbook
+.Sh SEARCH TERMS
+Search terms can be simple strings, which will be treated as case-insensitive with leading and trailing spaces removed.  If a string
+begins and ends with parentheses, those will also be removed from the search.  Thus, you can force a search for leading or trailing
+blanks by enclosing the string in parentheses.  Quotes are treated as any other character.  The entire string is converted to a
+regular expression, so special characters like ^, $, etc. will need to be escaped wth a \ if you do not want their regular expression behavior.
+If you do not include the ^, $, or other regular expression anchors, then the pattern will be sought anywhere within the designated fields.
+.Pp
+If the term begins with one or more word characters followed by '=', then the left of the '=' is the name of the field to search, while the right of the '=' is the pattern sought.  Otherwise, all fields fill be searched for the entire term.
+.Pp
+Additionally, if a '&&' or '||' occur between terms, they will be treated as logical 'and' and 'or', respectively.  Parentheses can be used
+to group these operations, and are recommended where '&&' and '||' are mixed, since the default grouping is right-associative.
+.Sh EXAMPLES
+.Bl -tag -width lockname
+.It Cm aqua 'camden'
+Finds all contacts containing 'camden' (case-insensitive) in any field
+.It Cm aqua 'state=WA && notes=friend'
+All of your friends in Washington
+.It Cm aqua 'state=(AK|WA|OR|CA)'
+West Coast contacts
+.It Cm aqua 'notes=^$'
+Contacts with no notes
+.It Cm aqua 'notes=.'
+Contacts with at least one character in the notes field
+.It Cm aqua '(name=smith || address=12[0-9]{2}) && city=seattle'
+Anyone in Seattle whose name contains smith or whose address contains a number between 1200 and 1299, inclusive.
+.Sh MUTT INTEGRATION
+To use aqua as the query engine for
+.Xr mutt 1 ,
+add the following line to .muttrc:
+.Pp
+set query_command="aqua %s"
+.Pp
+mutt automatically quotes the argument so whatever the user enters becomes the first argument to aqua.  mutt also escapes any special
+characters that would  be caught be the shell.  Obviously, you can add any of the above options that you may desire.
+.Sh SEE ALSO
+.Xr abook 1 ,
+.Xr mutt 1
+.Sh AUTHOR
+Sterling (Chip) Camden <sterling@camdensoftware.com>
+.Sh WWW
+<http://chipstips.com/?tag=rbaqua>
+.Sh BUGS
+None known.

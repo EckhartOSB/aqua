@@ -1,0 +1,112 @@
+#!/usr/bin/env ruby
+require 'optparse'
+
+abook = '~/.abook/addressbook'
+email = lambda {|who| who['email']}
+
+optparse = OptionParser.new do |opts|
+  opts.banner = 'usage: aqua [-1] [-f addressbook] term...'
+
+  opts.on('-1', '--first', 'Only retrieve the first email for each person') do
+    email = lambda {|who| who['email'].sub /,.*/, '' }
+  end
+
+  opts.on('-f', '--file addressbook', 'Specify address book to use') do |file|
+    abook = file
+  end
+
+end
+
+begin
+  optparse.parse!
+rescue OptionParser::InvalidOption, OptionParser::MissingArgument => e
+  puts e
+  puts optparse
+  exit 1
+end
+
+# resolve an operand to a lambda
+def resolve(query)
+  if query.is_a? String
+    q = query.strip
+    while /^\((.*)\)$/ =~ q
+      q = $1.strip
+    end
+    if /^(\w+?)=(.+)/ =~ q
+      key = $1
+      val = /#{$2}/i
+      lambda {|who| val =~ (who[key] || '')}
+    else
+      val = /#{q}/i
+      lambda {|who| who.detect {|k,v| val =~ v}}
+    end
+  else
+    query
+  end
+end
+
+# construct a boolean lambda
+def make_boolean(op, left, right)
+  l = resolve left
+  r = resolve right
+  case op
+    when '&'
+      lambda {|who| l.call(who) && r.call(who) }
+    when '|'
+      lambda {|who| l.call(who) || r.call(who) }
+    else
+      raise "Bad boolean operator: #{c*2}"
+  end
+end
+
+# parse a query
+def parse(query, in_operand = false)
+  operand = ""
+  while c = query.shift
+    case c
+      when ')'
+        break;
+      when '('
+	o = parse(query, /\S/ =~ operand)
+	if o.is_a? String
+	  operand << "(#{o})"
+	else
+	  operand = o
+	end
+      when /&|\|/
+        if in_operand || query.size < 1 || query[0] != c
+	  operand << c if operand.is_a? String
+	else
+	  operand = make_boolean(query.shift, operand, parse(query))
+	  break
+	end
+      else
+        operand << c if operand.is_a? String
+    end
+  end
+  return operand
+end
+
+# parse remaining arguments as a query
+
+search = resolve parse(ARGV.join(' ').split(//))
+
+who = nil
+found = []
+File.open(File.expand_path abook).each do |line|
+  case line.chomp.strip
+    when /^$/
+      found << "#{email.call who}\t#{who['name']}\t#{who['notes']}" if who && who['email'] && search.call(who)
+    when /^\[\d+\]/
+      who = {}
+    when /^(\w+?)=(.+)/
+      who[$1] = $2.strip if who
+  end
+end
+
+if found.size > 0
+  puts "#{found.size} found"
+  puts found
+else
+  puts "Not found"
+end

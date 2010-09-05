@@ -1,0 +1,15 @@
+aqua -- Advanced Query Using Abook
+
+This utility replaces the mutt-query function of abook
+with one that can:
+
+1. Search all fields, not just name and email
+2. Search specific fields
+3. Combine criteria with and/or
+4. Group operations with parentheses
+5. Use regular expressions
+
+See the man page for details.
+
+Chip Camden, September 2010
+http://chipstips.com/?tag=rbaqua
