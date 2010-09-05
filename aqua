@@ -29,7 +29,7 @@ end
 def resolve(query)
   if query.is_a? String
     q = query.strip
-    while /^\((.*)\)$/ =~ q
+    while (/^\((.*)\)$/ =~ q)
       q = $1.strip
     end
     if /^(\w+?)=(.+)/ =~ q
@@ -42,20 +42,6 @@ def resolve(query)
     end
   else
     query
-  end
-end
-
-# construct a boolean lambda
-def make_boolean(op, left, right)
-  l = resolve left
-  r = resolve right
-  case op
-    when '&'
-      lambda {|who| l.call(who) && r.call(who) }
-    when '|'
-      lambda {|who| l.call(who) || r.call(who) }
-    else
-      raise "Bad boolean operator: #{c*2}"
   end
 end
 
@@ -77,8 +63,25 @@ def parse(query, in_operand = false)
         if in_operand || query.size < 1 || query[0] != c
 	  operand << c if operand.is_a? String
 	else
-	  operand = make_boolean(query.shift, operand, parse(query))
-	  break
+	  operand = lambda do |op, left, right|
+	    l = resolve left
+	    r = resolve right
+	    case op
+	      when '&'
+		lambda {|who| l.call(who) && r.call(who) }
+	      when '|'
+		lambda {|who| l.call(who) || r.call(who) }
+	    end
+	  end.call(query.shift, operand, parse(query))
+	end
+      when '!'
+        if in_operand || (operand.is_a?(String) && (/\S/ =~ operand))
+	  operand << c
+	else
+	  operand = lambda do |qu|
+	    q = resolve qu
+	    lambda {|who| !q.call(who) }
+	  end.call(parse(query))
 	end
       else
         operand << c if operand.is_a? String

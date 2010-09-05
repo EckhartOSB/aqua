@@ -1,5 +1,5 @@
 .\" man page for the pcpustat utility.
-.Dd September 4, 2010
+.Dd September 5, 2010
 .Dt aqua 1
 .Os
 .Sh NAME
@@ -31,6 +31,9 @@ If the term begins with one or more word characters followed by '=', then the le
 .Pp
 Additionally, if a '&&' or '||' occur between terms, they will be treated as logical 'and' and 'or', respectively.  Parentheses can be used
 to group these operations, and are recommended where '&&' and '||' are mixed, since the default grouping is right-associative.
+.Pp
+If a term begins with '!', then the exclamation point is treated as a logical 'not' operator.  An exclamation point anywhere else in a
+term is treated as a literal.
 .Sh EXAMPLES
 .Bl -tag -width lockname
 .It Cm aqua 'camden'
@@ -45,6 +48,8 @@ Contacts with no notes
 Contacts with at least one character in the notes field
 .It Cm aqua '(name=smith || address=12[0-9]{2}) && city=seattle'
 Anyone in Seattle whose name contains smith or whose address contains a number between 1200 and 1299, inclusive.
+.It Cm aqua 'state=WA && !name=camden'
+Anyone in Washington whose name does not contain 'camden'
 .Sh MUTT INTEGRATION
 To use aqua as the query engine for
 .Xr mutt 1 ,

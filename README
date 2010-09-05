@@ -5,7 +5,7 @@ with one that can:
 
 1. Search all fields, not just name and email
 2. Search specific fields
-3. Combine criteria with and/or
+3. Combine criteria with and/or/not
 4. Group operations with parentheses
 5. Use regular expressions
 
