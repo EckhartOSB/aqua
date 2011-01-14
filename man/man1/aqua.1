@@ -24,7 +24,7 @@ Specify the address book to search.  The default is ~/.abook/addressbook
 Search terms can be simple strings, which will be treated as case-insensitive with leading and trailing spaces removed.  If a string
 begins and ends with parentheses, those will also be removed from the search.  Thus, you can force a search for leading or trailing
 blanks by enclosing the string in parentheses.  Quotes are treated as any other character.  The entire string is converted to a
-regular expression, so special characters like ^, $, etc. will need to be escaped wth a \ if you do not want their regular expression behavior.
+regular expression, so special characters like ^, $, etc. will need to be escaped wth a \\ if you do not want their regular expression behavior.
 If you do not include the ^, $, or other regular expression anchors, then the pattern will be sought anywhere within the designated fields.
 .Pp
 If the term begins with one or more word characters followed by '=', then the left of the '=' is the name of the field to search, while the right of the '=' is the pattern sought.  Otherwise, all fields fill be searched for the entire term.
