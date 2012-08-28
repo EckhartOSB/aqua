@@ -9,17 +9,20 @@
 .Nm
 .Op Fl 1
 .Op Fl f Ar addressbook
+.Op Fl n
 .Op Ar term...
 .Sh DESCRIPTION
 The aqua utility provides a drop-in replacement for abook's mutt-query option.  Whereas abook only searches its name and email fields,
 aqua can search all fields.  You can also specify which specific fields to search, combine searches with and/or and parenthesized grouping,
-and include regular expressions.  aqua only returns contacts who have at least one email address.
+and include regular expressions.  aqua only returns contacts who have at least one email address, unless you specify the -n option.
 .Sh OPTIONS
 .Bl -tag -width indent
 .It Fl 1, -first
 Only return the first email address for each matching entry.  By default, all addresses are returned, separated by commas.
 .It Fl f, -file Ar addressbook
 Specify the address book to search.  The default is ~/.abook/addressbook
+.It Fl n, -noemail
+Include contacts that have no email address
 .Sh SEARCH TERMS
 Search terms can be simple strings, which will be treated as case-insensitive with leading and trailing spaces removed.  If a string
 begins and ends with parentheses, those will also be removed from the search.  Thus, you can force a search for leading or trailing
